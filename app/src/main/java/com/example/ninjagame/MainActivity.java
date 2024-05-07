@@ -106,6 +106,10 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "The field is empty", Toast.LENGTH_SHORT).show();
                 }else{
                     saveDates(name);
+
+
+
+
                 }
                 //podemos guardar el nombre del jugador en las SharedPreferences
             }
