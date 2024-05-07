@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">NinjaGame</string>
+    <string name="jugar">Jugar</string>
+    <string name="puntuacions">Puntuacions</string>
+    <string name="salir">Salir</string>
+    <string name="prefMusica">Reproducir Musica</string>
+    <string name="descMusica">Se reproduce musica de fondo</string>
+    <string name="prefNinja">Ninja</string>
+    <string name="descNinja">Escojer Ninja</string>
+    <string name="prefEnemigos">Numero de enemigos</string>
+    <string name="descEnemigos">Cantidad inical de enemigos</string>
+    <string name="NinjaGame">NinjaGame</string>
+    <string name="generalPref">com.example.ninjagame_scores</string>
+    <string name="nameExist">"Hello again "</string>
+    <string name="top5">Top 5 Players</string>
+    <string name="gameOverName">GameOver</string>
+</resources>

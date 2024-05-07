@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Ajustes de Menu">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="boolMusic"
+            android:summary="@string/descMusica"
+            android:title="@string/prefMusica" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Ajustes del juego">
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/ninja"
+            android:entryValues="@array/idNinja"
+            android:key="prefNinja"
+            android:summary="@string/descNinja"
+            android:title="@string/prefNinja" />
+        <EditTextPreference
+            android:defaultValue="3"
+            android:key="prefEnemigos"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="@string/descEnemigos"
+            android:title="@string/prefEnemigos"
+            android:inputType="number"/>
+    </PreferenceCategory>
+</PreferenceScreen>
