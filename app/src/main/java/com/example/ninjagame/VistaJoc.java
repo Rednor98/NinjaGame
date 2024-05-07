@@ -3,6 +3,7 @@ package com.example.ninjagame;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -44,8 +45,12 @@ public class VistaJoc extends View {
 
     private int lifeNinja = 0;
 
+    private Bundle bundle;
+
+
     public VistaJoc(Context context, AttributeSet attrs) {
         super(context, attrs);
+
         //Ninja Life
         lifeNinja = 1;
         // Obtenim referència al recurs ninja_enemic guardat en carpeta Res

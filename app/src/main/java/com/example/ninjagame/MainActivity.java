@@ -23,14 +23,13 @@ import androidx.preference.PreferenceManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 
 public class MainActivity extends AppCompatActivity {
+    public static String prefEnemigos;
+    public static String prefNinja;
     boolean isMusicEnabled;
     private Button btJugar;
     private Button btPuntuacions;
@@ -38,9 +37,6 @@ public class MainActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private SharedPreferences generalPref;
     private SharedPreferences scorePref;
-    public static String prefEnemigos;
-
-    public static String prefNinja;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,8 +66,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getPrefs() {
-        prefEnemigos = generalPref.getString("prefEnemigos","");
-        prefNinja = generalPref.getString("prefNinja","");
+        prefEnemigos = generalPref.getString("prefEnemigos", "");
+        prefNinja = generalPref.getString("prefNinja", "");
     }
 
     @Override
@@ -102,14 +98,10 @@ public class MainActivity extends AppCompatActivity {
         alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String name = input.getText().toString();
-                if(name.isEmpty()){
+                if (name.isEmpty()) {
                     Toast.makeText(MainActivity.this, "The field is empty", Toast.LENGTH_SHORT).show();
-                }else{
+                } else {
                     saveDates(name);
-
-
-
-
                 }
                 //podemos guardar el nombre del jugador en las SharedPreferences
             }
@@ -119,12 +111,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void saveDates(String name) {
         SharedPreferences.Editor editor = scorePref.edit();
+        Intent i = new Intent(MainActivity.this, Joc.class);
+        i.putExtra("userName",name);
         if (scorePref.contains(name)) {
             Toast.makeText(this, getString(R.string.nameExist) + name + "!!!", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(MainActivity.this,Joc.class));
+            startActivity(i);
         } else {
-            editor.putInt(name,0);
-            startActivity(new Intent(MainActivity.this,Joc.class));
+            editor.putInt(name, 0);
+            startActivity(i);
         }
     }
 
@@ -150,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
 
         View view = (getLayoutInflater().inflate(R.layout.list_layout, null));
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listaMostrada.subList(0,5));
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listaMostrada.subList(0, 5));
 
         ListView lsView = view.findViewById(R.id.lvListPunt);
 
@@ -158,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
 
         createAlertDialogList(view);
     }
-
 
 
     private void createAlertDialogList(View view) {
