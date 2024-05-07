@@ -1,6 +1,8 @@
 package com.example.ninjagame;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -28,6 +30,10 @@ public class VistaJoc extends View {
     private final int numObjectius;
     private final Drawable[] ninjaDraws = new Drawable[]{getContext().getDrawable(R.drawable.ninja01), getContext().getDrawable(R.drawable.ninja02), getContext().getDrawable(R.drawable.ninja03)};
     private final Vector<Grafics> objectius = new Vector<Grafics>();
+    private final Drawable[] drawableObjectiu = new Drawable[8];
+    private final Drawable drawableNinja;
+    private final Drawable drawableGanivet;
+    private final Drawable drawableEnemic;
     private int girNinja; // Increment de direcció
     private float acceleracioNinja; // augment de velocitat
     // Quan es va realitzar l'últim procés
@@ -35,24 +41,26 @@ public class VistaJoc extends View {
     private float mX = 0, mY = 0;
     private boolean llancament = false;
     // //// LLANÇAMENT //////
-    private Grafics ganivet;
+    private final Grafics ganivet;
     private boolean ganivetActiu = false;
     private int tempsGanivet;
-    private final Drawable[] drawableObjectiu = new Drawable[8];
-    private final Drawable drawableNinja;
-    private final Drawable drawableGanivet;
-    private final Drawable drawableEnemic;
-
     private int lifeNinja = 0;
 
     private Bundle bundle;
+    private final SharedPreferences preferences;
+    private String name;
+    private Activity pare;
+
 
 
     public VistaJoc(Context context, AttributeSet attrs) {
         super(context, attrs);
 
+        bundle = new Bundle();
+        name = bundle.getString("userName","");
+        preferences = context.getSharedPreferences(context.getString(R.string.NinjaGame), Context.MODE_PRIVATE);
         //Ninja Life
-        lifeNinja = 1;
+        lifeNinja = 0;
         // Obtenim referència al recurs ninja_enemic guardat en carpeta Res
         drawableEnemic = context.getResources().getDrawable(R.drawable.ninja_enemic, null);
         // Obtenim referència al recurs ninja guardat en carpeta Res
@@ -81,7 +89,9 @@ public class VistaJoc extends View {
         drawableObjectiu[6] = context.getResources().getDrawable(R.drawable.brac_esquerre, null);
 
     }
-
+    public void setPare(Activity pare) {
+        this.pare = pare;
+    }
     // Métode que ens dóna ample i alt pantalla
     @Override
     protected void onSizeChanged(int ancho, int alto, int ancho_anter, int alto_anter) {
@@ -153,10 +163,9 @@ public class VistaJoc extends View {
                         destrueixObjectiu(i);
                         break;
                     }
-                for (int i = 0; i < objectius.size(); i++){
-                    if(ninja.verificaColision(objectius.elementAt(i))){
+                for (int i = 0; i < objectius.size(); i++) {
+                    if (objectius.elementAt(i).verificaColision(ninja)) {
                         lifeNinja--;
-                        gameOver();
                         break;
                     }
                 }
@@ -168,10 +177,11 @@ public class VistaJoc extends View {
     private void gameOver() {
         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
         alert.setTitle(R.string.gameOverName);
-        alert.setMessage("Player: " );
+        alert.setMessage("Player: " + name +  preferences.getInt(name,0));
         alert.setPositiveButton("Salir", ((dialog, which) -> {
+            pare.finish();
         }));
-
+        //TODO No se puede hacer un alertDialog en VistaJoc porque es un View, Mirar a ver si se puede y si no en la activity
         alert.show();
     }
 
@@ -293,8 +303,11 @@ public class VistaJoc extends View {
     class ThreadJoc extends Thread {
         @Override
         public void run() {
-            while (lifeNinja >= 1) {
+            while (lifeNinja != 0) {
                 actualitzaMoviment();
+            }
+            if(lifeNinja == 0){
+                gameOver();
             }
         }
     }
