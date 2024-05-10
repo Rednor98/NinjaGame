@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -51,6 +53,9 @@ public class VistaJoc extends View {
     private String name;
     private Joc pare;
 
+    private int points;
+
+    MediaPlayer mpLlancament, mpExplosio;
 
     public VistaJoc(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -86,6 +91,8 @@ public class VistaJoc extends View {
         drawableObjectiu[5] = context.getResources().getDrawable(R.drawable.brac_dret, null);
         drawableObjectiu[6] = context.getResources().getDrawable(R.drawable.brac_esquerre, null);
 
+        mpLlancament = MediaPlayer.create(context,R.raw.llancament);
+        mpExplosio = MediaPlayer.create(context,R.raw.explosio);
     }
     public void setPare(Joc pare) {
         this.pare = pare;
@@ -175,9 +182,11 @@ public class VistaJoc extends View {
 
 
     private void destrueixObjectiu(int i) {
+        points++;
+        mpExplosio.start();
         objectius.remove(i);
         ganivetActiu = false;
-        int numParts = 3;
+        int numParts = 8;
         if (objectius.get(i).getDrawable() == drawableEnemic) {
             for (int n = 0; n < numParts; n++) {
                 Grafics objectiu = new Grafics(this, drawableObjectiu[n]);
@@ -193,6 +202,7 @@ public class VistaJoc extends View {
     }
 
     private void DisparaGanivet() {
+        mpLlancament.start();
         ganivet.setPosX(ninja.getPosX() + ninja.getAmplada() / 2 - ganivet.getAmplada() / 2);
         ganivet.setPosY(ninja.getPosY() + ninja.getAltura() / 2 - ganivet.getAltura() / 2);
         ganivet.setAngle(ninja.getAngle());
@@ -295,13 +305,10 @@ public class VistaJoc extends View {
             while (lifeNinja != 0) {
                 actualitzaMoviment();
             }
-            VistaJoc.this.post(new Runnable() {
-                @Override
-                public void run() {
-                    bundle = pare.getIntent().getExtras();
-                    name = bundle.getString("userName");
-                    pare.gameOver(name, preferences.getInt(name, 0));
-                }
+            VistaJoc.this.post(() -> {
+                bundle = pare.getIntent().getExtras();
+                name = bundle.getString("userName");
+                pare.gameOver(name, preferences.getInt(name, 0), points);
             });
         }
 

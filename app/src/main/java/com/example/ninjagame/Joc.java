@@ -1,13 +1,15 @@
 package com.example.ninjagame;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.widget.EditText;
-
 public class Joc extends AppCompatActivity {
+    SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -15,16 +17,26 @@ public class Joc extends AppCompatActivity {
         setContentView(R.layout.activity_joc);
         VistaJoc vistaJoc = findViewById(R.id.VistaJoc);
         vistaJoc.setPare(this);
+        preferences = getSharedPreferences(getString(R.string.NinjaGame), Context.MODE_PRIVATE);
 
     }
-    public void gameOver(String name, int score) {
+
+    public void gameOver(String name, int score, int points) {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        SharedPreferences.Editor editor = preferences.edit();
         alert.setTitle(R.string.gameOverName);
-        alert.setMessage("Player: " + name +  score);
-        alert.setPositiveButton("Salir", ((dialog, which) -> {
+        alert.setMessage("Player: " + name + " TopScore: " + score + " \n " + "Score: " + points);
+        if (points > score) {
+            editor.putInt(name, points);
+        }
+        alert.setNegativeButton("Salir", ((dialog, which) -> {
             finish();
         }));
-        //TODO No se puede hacer un alertDialog en VistaJoc porque es un View, Mirar a ver si se puede y si no en la activity
+        alert.setPositiveButton("Reintentar", ((dialog, which) -> {
+            Intent intent = getIntent();
+            finish();
+            startActivity(intent);
+        }));
         alert.show();
     }
 }
