@@ -49,18 +49,16 @@ public class VistaJoc extends View {
     private Bundle bundle;
     private final SharedPreferences preferences;
     private String name;
-    private Activity pare;
-
+    private Joc pare;
 
 
     public VistaJoc(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        bundle = new Bundle();
-        name = bundle.getString("userName","");
+
         preferences = context.getSharedPreferences(context.getString(R.string.NinjaGame), Context.MODE_PRIVATE);
         //Ninja Life
-        lifeNinja = 0;
+        lifeNinja = 1;
         // Obtenim referència al recurs ninja_enemic guardat en carpeta Res
         drawableEnemic = context.getResources().getDrawable(R.drawable.ninja_enemic, null);
         // Obtenim referència al recurs ninja guardat en carpeta Res
@@ -89,7 +87,7 @@ public class VistaJoc extends View {
         drawableObjectiu[6] = context.getResources().getDrawable(R.drawable.brac_esquerre, null);
 
     }
-    public void setPare(Activity pare) {
+    public void setPare(Joc pare) {
         this.pare = pare;
     }
     // Métode que ens dóna ample i alt pantalla
@@ -174,16 +172,7 @@ public class VistaJoc extends View {
         }
     }
 
-    private void gameOver() {
-        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-        alert.setTitle(R.string.gameOverName);
-        alert.setMessage("Player: " + name +  preferences.getInt(name,0));
-        alert.setPositiveButton("Salir", ((dialog, which) -> {
-            pare.finish();
-        }));
-        //TODO No se puede hacer un alertDialog en VistaJoc porque es un View, Mirar a ver si se puede y si no en la activity
-        alert.show();
-    }
+
 
     private void destrueixObjectiu(int i) {
         objectius.remove(i);
@@ -306,9 +295,15 @@ public class VistaJoc extends View {
             while (lifeNinja != 0) {
                 actualitzaMoviment();
             }
-            if(lifeNinja == 0){
-                gameOver();
-            }
+            VistaJoc.this.post(new Runnable() {
+                @Override
+                public void run() {
+                    bundle = pare.getIntent().getExtras();
+                    name = bundle.getString("userName");
+                    pare.gameOver(name, preferences.getInt(name, 0));
+                }
+            });
         }
+
     }
 }
