@@ -25,9 +25,10 @@ public class Joc extends AppCompatActivity {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         SharedPreferences.Editor editor = preferences.edit();
         alert.setTitle(R.string.gameOverName);
-        alert.setMessage("Player: " + name + " TopScore: " + score + " \n " + "Score: " + points);
+        alert.setMessage("Player: " + name + " TopScore: " + score + "\n" + "Score: " + points);
         if (points > score) {
             editor.putInt(name, points);
+            editor.commit();
         }
         alert.setNegativeButton("Salir", ((dialog, which) -> {
             finish();

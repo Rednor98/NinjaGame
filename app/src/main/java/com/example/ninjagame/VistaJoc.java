@@ -31,7 +31,7 @@ public class VistaJoc extends View {
     private final ThreadJoc thread = new ThreadJoc();
     private final int numObjectius;
     private final Drawable[] ninjaDraws = new Drawable[]{getContext().getDrawable(R.drawable.ninja01), getContext().getDrawable(R.drawable.ninja02), getContext().getDrawable(R.drawable.ninja03)};
-    private final Vector<Grafics> objectius = new Vector<Grafics>();
+    private final Vector<Grafics> objectius = new Vector<>();
     private final Drawable[] drawableObjectiu = new Drawable[8];
     private final Drawable drawableNinja;
     private final Drawable drawableGanivet;
@@ -55,7 +55,7 @@ public class VistaJoc extends View {
 
     private int points;
 
-    MediaPlayer mpLlancament, mpExplosio;
+    private MediaPlayer mpLlancament, mpExplosio;
 
     public VistaJoc(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -85,11 +85,11 @@ public class VistaJoc extends View {
         }
         drawableObjectiu[0] = context.getResources().getDrawable(R.drawable.cap_ninja, null); //cap
         drawableObjectiu[1] = context.getResources().getDrawable(R.drawable.cos_ninja, null); //cos
-        drawableObjectiu[2] = context.getResources().getDrawable(R.drawable.cua_ninja, null);
-        drawableObjectiu[3] = context.getResources().getDrawable(R.drawable.cama_dreta, null);
-        drawableObjectiu[4] = context.getResources().getDrawable(R.drawable.cama_esquerra, null);
-        drawableObjectiu[5] = context.getResources().getDrawable(R.drawable.brac_dret, null);
-        drawableObjectiu[6] = context.getResources().getDrawable(R.drawable.brac_esquerre, null);
+        drawableObjectiu[2] = context.getResources().getDrawable(R.drawable.cua_ninja, null); //cua
+        drawableObjectiu[3] = context.getResources().getDrawable(R.drawable.cama_dreta, null); //cama
+        drawableObjectiu[4] = context.getResources().getDrawable(R.drawable.cama_esquerra, null); //cama
+        drawableObjectiu[5] = context.getResources().getDrawable(R.drawable.brac_dret, null); //brac
+        drawableObjectiu[6] = context.getResources().getDrawable(R.drawable.brac_esquerre, null); //brac
 
         mpLlancament = MediaPlayer.create(context,R.raw.llancament);
         mpExplosio = MediaPlayer.create(context,R.raw.explosio);
@@ -103,14 +103,15 @@ public class VistaJoc extends View {
         super.onSizeChanged(ancho, alto, ancho_anter, alto_anter);
         // Una vegada que coneixem el nostre ample i alt situem els objectius de
         // forma aleatória
+        ninja.setPosX(ancho / 2 - ninja.getAmplada() / 2);
+        ninja.setPosY(alto / 2 - ninja.getAltura() / 2);
         for (Grafics objectiu : objectius) {
             do {
                 objectiu.setPosX(Math.random() * (ancho - objectiu.getAmplada()));
                 objectiu.setPosY(Math.random() * (alto - objectiu.getAltura()));
             } while (objectiu.distancia(ninja) < (ancho + alto) / 5);
         }
-        ninja.setPosX(ancho / 2 - ninja.getAmplada() / 2);
-        ninja.setPosY(alto / 2 - ninja.getAltura() / 2);
+
 
         ultimProces = System.currentTimeMillis();
         thread.start();
@@ -182,11 +183,11 @@ public class VistaJoc extends View {
 
 
     private void destrueixObjectiu(int i) {
-        points++;
-        mpExplosio.start();
-        objectius.remove(i);
+
+
+
         ganivetActiu = false;
-        int numParts = 8;
+        int numParts = 7;
         if (objectius.get(i).getDrawable() == drawableEnemic) {
             for (int n = 0; n < numParts; n++) {
                 Grafics objectiu = new Grafics(this, drawableObjectiu[n]);
@@ -199,6 +200,9 @@ public class VistaJoc extends View {
                 objectius.add(objectiu);
             }
         }
+        objectius.remove(i);
+        mpExplosio.start();
+        points++;
     }
 
     private void DisparaGanivet() {
@@ -305,11 +309,14 @@ public class VistaJoc extends View {
             while (lifeNinja != 0) {
                 actualitzaMoviment();
             }
-            VistaJoc.this.post(() -> {
-                bundle = pare.getIntent().getExtras();
-                name = bundle.getString("userName");
-                pare.gameOver(name, preferences.getInt(name, 0), points);
-            });
+            if(lifeNinja == 0 || objectius.size() < numObjectius){
+                VistaJoc.this.post(() -> {
+                    bundle = pare.getIntent().getExtras();
+                    name = bundle.getString("userName");
+                    pare.gameOver(name, preferences.getInt(name, 0), points);
+                });
+            }
+
         }
 
     }
