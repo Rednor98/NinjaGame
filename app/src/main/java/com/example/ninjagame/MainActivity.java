@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -24,6 +25,7 @@ import androidx.preference.PreferenceManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -60,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
 
         scorePref = getSharedPreferences(getString(R.string.NinjaGame), Context.MODE_PRIVATE);
         checkMusic();
-        setPlayers();
         getPrefs();
 
     }
@@ -112,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
     private void saveDates(String name) {
         SharedPreferences.Editor editor = scorePref.edit();
         Intent i = new Intent(MainActivity.this, Joc.class);
-        i.putExtra("userName",name);
+        i.putExtra("userName", name);
         if (scorePref.contains(name)) {
             Toast.makeText(this, getString(R.string.nameExist) + name + "!!!", Toast.LENGTH_SHORT).show();
             startActivity(i);
@@ -125,32 +126,48 @@ public class MainActivity extends AppCompatActivity {
 
     public void lsPuntuaciones() {
         scorePref = getSharedPreferences(getString(R.string.NinjaGame), Context.MODE_PRIVATE);
-        Map<String, ?> allEntries = scorePref.getAll();
-        Map<String, Integer> mapPuntuaciones = new HashMap<>();
-        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-            mapPuntuaciones.put(entry.getKey(), (Integer) entry.getValue());
+
+        if (scorePref.getAll().isEmpty()) {
+            Toast.makeText(this, "La lista de las puntuaciones esta vacia", Toast.LENGTH_SHORT).show();
+        }else {
+            Map<String, ?> allEntries = scorePref.getAll();
+            Map<String, Integer> mapPuntuaciones = new HashMap<>();
+            for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+                mapPuntuaciones.put(entry.getKey(), (Integer) entry.getValue());
+            }
+
+
+            ArrayList<Map.Entry<String, Integer>> listaPuntuaciones = new ArrayList<>(mapPuntuaciones.entrySet());
+
+            Collections.sort(listaPuntuaciones, (entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));
+
+            ArrayList<String> listaMostrada = new ArrayList<>();
+
+            for (Map.Entry<String, Integer> entry : listaPuntuaciones) {
+                listaMostrada.add(entry.getKey() + " \t\t " + entry.getValue());
+            }
+
+            View view = (getLayoutInflater().inflate(R.layout.list_layout, null));
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, getList(listaMostrada));
+
+            ListView lsView = view.findViewById(R.id.lvListPunt);
+
+            lsView.setAdapter(adapter);
+
+            createAlertDialogList(view);
         }
 
+    }
 
-        ArrayList<Map.Entry<String, Integer>> listaPuntuaciones = new ArrayList<>(mapPuntuaciones.entrySet());
-
-        Collections.sort(listaPuntuaciones, (entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));
-
-        ArrayList<String> listaMostrada = new ArrayList<>();
-
-        for (Map.Entry<String, Integer> entry : listaPuntuaciones) {
-            listaMostrada.add(entry.getKey() + " \t\t " + entry.getValue());
+    @NonNull
+    private static List<String> getList(ArrayList<String> listaMostrada) {
+        if(listaMostrada.size() < 5){
+            return listaMostrada;
+        }else {
+            return listaMostrada.subList(0, 5);
         }
 
-        View view = (getLayoutInflater().inflate(R.layout.list_layout, null));
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listaMostrada.subList(0, 5));
-
-        ListView lsView = view.findViewById(R.id.lvListPunt);
-
-        lsView.setAdapter(adapter);
-
-        createAlertDialogList(view);
     }
 
 
@@ -168,7 +185,6 @@ public class MainActivity extends AppCompatActivity {
     private void checkMusic() {
         //Pendiente de revision
         isMusicEnabled = generalPref.getBoolean("boolMusic", false);
-        Log.v("TEST", Boolean.toString(isMusicEnabled));
 
         if (isMusicEnabled) {
             mediaPlayer.setLooping(true);
@@ -209,22 +225,6 @@ public class MainActivity extends AppCompatActivity {
     public void setBtSalir() {
         finish();
         mediaPlayer.pause();
-    }
-
-    public void setPlayers() {
-        SharedPreferences.Editor editor = scorePref.edit();
-
-        editor.putInt("Adri", 0);
-        editor.putInt("Sergi", 2);
-        editor.putInt("Lucas", 6);
-        editor.putInt("Toni", 8);
-        editor.putInt("Josue", 32);
-        editor.putInt("Mikel", 10);
-        editor.putInt("Carlos", -2);
-        editor.putInt("Samuel", 7);
-        editor.putInt("Ariel", 39);
-
-        editor.commit();
     }
 
 }                                                                                   

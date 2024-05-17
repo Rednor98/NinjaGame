@@ -21,11 +21,16 @@ public class Joc extends AppCompatActivity {
 
     }
 
-    public void gameOver(String name, int score, int points) {
+    public void gameOver(String name, int score, int points, boolean winner) {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         SharedPreferences.Editor editor = preferences.edit();
-        alert.setTitle(R.string.gameOverName);
-        alert.setMessage("Player: " + name + " TopScore: " + score + "\n" + "Score: " + points);
+        if(winner){
+            alert.setTitle(R.string.winner);
+        } else if (!winner) {
+            alert.setTitle(R.string.gameOverName);
+        }
+
+        alert.setMessage("Player: " + name + "\n" + "TopScore: " + score + " Score: " + points);
         if (points > score) {
             editor.putInt(name, points);
             editor.commit();

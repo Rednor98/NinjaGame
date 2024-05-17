@@ -26,4 +26,5 @@
             android:title="@string/prefEnemigos"
             android:inputType="number"/>
     </PreferenceCategory>
+
 </PreferenceScreen>
