@@ -12,28 +12,24 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.preference.PreferenceManager;
+
 import java.util.Vector;
 
 public class VistaJoc extends View {
     // Increment estàndard de gir i acceleració
     private static final int INC_GIR = 5;
     private static final float INC_ACCELERACIO = 0.5f;
-    // Cada quant temps volem processar canvis (ms)
+    //Cada quant temps volem processar canvis (ms)
     private static final int PERIODE_PROCES = 50;
     private static final int INC_VELOCITAT_GANIVET = 12;
-    // Temps d'invulnerabilitat després de col·lisionar (ms)
-    private static final long TEMPS_INVULNERABILITAT = 1000;
     // //// NINJA //////
     private final Grafics ninja;// Gràfic del ninja
     // //// THREAD I TEMPS //////
     // Thread encarregat de processar el joc
     private final ThreadJoc thread = new ThreadJoc();
     private final int numObjectius;
-    private final Drawable[] ninjaDraws = new Drawable[]{
-            getContext().getDrawable(R.drawable.ninja01),
-            getContext().getDrawable(R.drawable.ninja02),
-            getContext().getDrawable(R.drawable.ninja03)
-    };
+    private final Drawable[] ninjaDraws = new Drawable[]{getContext().getDrawable(R.drawable.ninja01), getContext().getDrawable(R.drawable.ninja02), getContext().getDrawable(R.drawable.ninja03)};
     private final Vector<Grafics> objectius = new Vector<>();
     private final Drawable[] drawableObjectiu = new Drawable[8];
     private final Drawable drawableNinja;
@@ -60,14 +56,13 @@ public class VistaJoc extends View {
     private boolean winner;
     private final Drawable heartDrawable;
     private final Paint textPaint;
-    private long tempsUltimaColisio = 0;
 
     public VistaJoc(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         preferences = context.getSharedPreferences(context.getString(R.string.NinjaGame), Context.MODE_PRIVATE);
         //Ninja Life
-        lifeNinja = 3; // Asignar el número de vidas iniciales aquí
+        lifeNinja = 1; // Asignar el número de vidas iniciales aquí
         // Obtenim referència al recurs ninja_enemic guardat en carpeta Res
         drawableEnemic = context.getResources().getDrawable(R.drawable.ninja_enemic, null);
         // Obtenim referència al recurs ninja guardat en carpeta Res
@@ -130,6 +125,8 @@ public class VistaJoc extends View {
 
         ultimProces = System.currentTimeMillis();
         thread.start();
+        MusicManager.getInstance().initialize(getContext(), R.raw.base);
+
     }
 
     // Métode que dibuixa la vista
@@ -183,15 +180,11 @@ public class VistaJoc extends View {
         }
         for (int i = 0; i < objectius.size(); i++) {
             if (objectius.elementAt(i).verificaColision(ninja)) {
-                long tempsActual = System.currentTimeMillis();
-                if (tempsActual - tempsUltimaColisio >= TEMPS_INVULNERABILITAT) {
-                    lifeNinja--;
-                    tempsUltimaColisio = tempsActual;
-                    if (lifeNinja <= 0) {
-                        // Aquí puedes manejar la lógica cuando el ninja se queda sin vidas
-                        lifeNinja = 0;
-                        break;
-                    }
+                lifeNinja--;
+                if (lifeNinja <= 0) {
+                    // Aquí puedes manejar la lógica cuando el ninja se queda sin vidas
+                    lifeNinja = 0;
+                    break;
                 }
             }
         }
@@ -347,4 +340,5 @@ public class VistaJoc extends View {
             });
         }
     }
+
 }

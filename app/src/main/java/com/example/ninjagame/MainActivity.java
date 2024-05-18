@@ -1,3 +1,4 @@
+
 package com.example.ninjagame;
 
 import android.content.Context;
@@ -129,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (scorePref.getAll().isEmpty()) {
             Toast.makeText(this, "La lista de las puntuaciones esta vacia", Toast.LENGTH_SHORT).show();
-        } else {
+        }else {
             Map<String, ?> allEntries = scorePref.getAll();
             Map<String, Integer> mapPuntuaciones = new HashMap<>();
             for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
@@ -162,9 +163,9 @@ public class MainActivity extends AppCompatActivity {
 
     @NonNull
     private static List<String> getList(ArrayList<String> listaMostrada) {
-        if (listaMostrada.size() < 5) {
+        if(listaMostrada.size() < 5){
             return listaMostrada;
-        } else {
+        }else {
             return listaMostrada.subList(0, 5);
         }
 
@@ -183,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void checkMusic() {
-
+        //Pendiente de revision
         isMusicEnabled = generalPref.getBoolean("boolMusic", false);
 
         if (isMusicEnabled) {
