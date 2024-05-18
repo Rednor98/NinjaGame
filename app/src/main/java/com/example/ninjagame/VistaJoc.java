@@ -3,6 +3,7 @@ package com.example.ninjagame;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -17,16 +18,22 @@ public class VistaJoc extends View {
     // Increment estàndard de gir i acceleració
     private static final int INC_GIR = 5;
     private static final float INC_ACCELERACIO = 0.5f;
-    //Cada quant temps volem processar canvis (ms)
+    // Cada quant temps volem processar canvis (ms)
     private static final int PERIODE_PROCES = 50;
     private static final int INC_VELOCITAT_GANIVET = 12;
+    // Temps d'invulnerabilitat després de col·lisionar (ms)
+    private static final long TEMPS_INVULNERABILITAT = 1000;
     // //// NINJA //////
     private final Grafics ninja;// Gràfic del ninja
     // //// THREAD I TEMPS //////
     // Thread encarregat de processar el joc
     private final ThreadJoc thread = new ThreadJoc();
     private final int numObjectius;
-    private final Drawable[] ninjaDraws = new Drawable[]{getContext().getDrawable(R.drawable.ninja01), getContext().getDrawable(R.drawable.ninja02), getContext().getDrawable(R.drawable.ninja03)};
+    private final Drawable[] ninjaDraws = new Drawable[]{
+            getContext().getDrawable(R.drawable.ninja01),
+            getContext().getDrawable(R.drawable.ninja02),
+            getContext().getDrawable(R.drawable.ninja03)
+    };
     private final Vector<Grafics> objectius = new Vector<>();
     private final Drawable[] drawableObjectiu = new Drawable[8];
     private final Drawable drawableNinja;
@@ -47,20 +54,20 @@ public class VistaJoc extends View {
     private Bundle bundle;
     private String name;
     private Joc pare;
-
     private int points;
-
     private final MediaPlayer mpLlancament;
     private final MediaPlayer mpExplosio;
-
     private boolean winner;
+    private final Drawable heartDrawable;
+    private final Paint textPaint;
+    private long tempsUltimaColisio = 0;
+
     public VistaJoc(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-
         preferences = context.getSharedPreferences(context.getString(R.string.NinjaGame), Context.MODE_PRIVATE);
         //Ninja Life
-        lifeNinja = 1;
+        lifeNinja = 3; // Asignar el número de vidas iniciales aquí
         // Obtenim referència al recurs ninja_enemic guardat en carpeta Res
         drawableEnemic = context.getResources().getDrawable(R.drawable.ninja_enemic, null);
         // Obtenim referència al recurs ninja guardat en carpeta Res
@@ -91,6 +98,15 @@ public class VistaJoc extends View {
         mpLlancament = MediaPlayer.create(context, R.raw.llancament);
         mpExplosio = MediaPlayer.create(context, R.raw.explosio);
         winner = false;
+
+        // Drawable del corazón
+        heartDrawable = context.getResources().getDrawable(R.drawable.heart, null);
+
+        // Configurar el Paint para el texto
+        textPaint = new Paint();
+        textPaint.setColor(getResources().getColor(android.R.color.white));
+        textPaint.setTextSize(50);
+        textPaint.setTextAlign(Paint.Align.CENTER);
     }
 
     public void setPare(Joc pare) {
@@ -112,11 +128,8 @@ public class VistaJoc extends View {
             } while (objectiu.distancia(ninja) < (ancho + alto) / 5);
         }
 
-
         ultimProces = System.currentTimeMillis();
         thread.start();
-
-
     }
 
     // Métode que dibuixa la vista
@@ -130,6 +143,18 @@ public class VistaJoc extends View {
             ganivet.dibuixaGrafic(canvas);
         }
         ninja.dibuixaGrafic(canvas);
+
+        // Dibujar el corazón y el número de vidas
+        int heartSize = 100;
+        int x = getWidth() - heartSize - 20;
+        int y = 20;
+        heartDrawable.setBounds(x, y, x + heartSize, y + heartSize);
+        heartDrawable.draw(canvas);
+
+        // Dibujar el número de vidas
+        int textX = x + heartSize / 2;
+        int textY = y + heartSize / 2 + 15;
+        canvas.drawText(String.valueOf(lifeNinja), textX, textY, textPaint);
     }
 
     synchronized protected void actualitzaMoviment() {
@@ -140,7 +165,6 @@ public class VistaJoc extends View {
         }
         // Per una execució en temps real calculem retard
         double retard = (instant_actual - ultimProces) / PERIODE_PROCES;
-        ultimProces = instant_actual; // Per a la propera vegada
         ultimProces = instant_actual; // Per a la propera vegada
         // Actualitzem velocitat i direcció del personatge Ninja a partir de
         // girNinja i acceleracioNinja (segons l'entrada del jugador)
@@ -159,8 +183,16 @@ public class VistaJoc extends View {
         }
         for (int i = 0; i < objectius.size(); i++) {
             if (objectius.elementAt(i).verificaColision(ninja)) {
-                lifeNinja--;
-                break;
+                long tempsActual = System.currentTimeMillis();
+                if (tempsActual - tempsUltimaColisio >= TEMPS_INVULNERABILITAT) {
+                    lifeNinja--;
+                    tempsUltimaColisio = tempsActual;
+                    if (lifeNinja <= 0) {
+                        // Aquí puedes manejar la lógica cuando el ninja se queda sin vidas
+                        lifeNinja = 0;
+                        break;
+                    }
+                }
             }
         }
         // Actualitzem posició de ganivet
@@ -178,7 +210,6 @@ public class VistaJoc extends View {
             }
         }
     }
-
 
     private void destrueixObjectiu(int i) {
         ganivetActiu = false;
@@ -304,7 +335,7 @@ public class VistaJoc extends View {
             while (lifeNinja != 0 && points < numObjectius) {
                 actualitzaMoviment();
             }
-            if(lifeNinja == 0){
+            if (lifeNinja == 0) {
                 winner = false;
             } else if (points == objectius.size()) {
                 winner = true;
@@ -314,9 +345,6 @@ public class VistaJoc extends View {
                 name = bundle.getString("userName");
                 pare.gameOver(name, preferences.getInt(name, 0), points, winner);
             });
-
-
         }
-
     }
 }
