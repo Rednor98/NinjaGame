@@ -11,9 +11,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -40,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private SharedPreferences generalPref;
     private SharedPreferences scorePref;
+    private ImageView ivNinjaImage;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +66,14 @@ public class MainActivity extends AppCompatActivity {
         mediaPlayer = MediaPlayer.create(this, R.raw.base);
         generalPref = PreferenceManager.getDefaultSharedPreferences(this);
 
+        ivNinjaImage = findViewById(R.id.ivNinjaImage);
+
         scorePref = getSharedPreferences(getString(R.string.NinjaGame), Context.MODE_PRIVATE);
         checkMusic();
         getPrefs();
+
+        Animation ninjaAnimation = AnimationUtils.loadAnimation(this,R.anim.ninja_move);
+        ivNinjaImage.startAnimation(ninjaAnimation);
 
     }
 
@@ -118,9 +128,11 @@ public class MainActivity extends AppCompatActivity {
         if (scorePref.contains(name)) {
             Toast.makeText(this, getString(R.string.nameExist) + name + "!!!", Toast.LENGTH_SHORT).show();
             startActivity(i);
+            mediaPlayer.pause();
         } else {
             editor.putInt(name, 0);
             startActivity(i);
+            mediaPlayer.pause();
         }
     }
 

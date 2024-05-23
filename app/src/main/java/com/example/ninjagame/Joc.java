@@ -4,13 +4,18 @@ package com.example.ninjagame;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 public class Joc extends AppCompatActivity {
     SharedPreferences preferences;
+    private MediaPlayer mediaPlayer;
+    boolean isMusicEnabled;
+    private SharedPreferences generalPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +24,35 @@ public class Joc extends AppCompatActivity {
         VistaJoc vistaJoc = findViewById(R.id.VistaJoc);
         vistaJoc.setPare(this);
         preferences = getSharedPreferences(getString(R.string.NinjaGame), Context.MODE_PRIVATE);
+        mediaPlayer = MediaPlayer.create(this, R.raw.base);
+        generalPref = PreferenceManager.getDefaultSharedPreferences(this);
+
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkMusic();
+
+    }
+    private void checkMusic() {
+        //Pendiente de revision
+        isMusicEnabled = generalPref.getBoolean("boolMusic", false);
+
+        if (isMusicEnabled) {
+            mediaPlayer.setLooping(true);
+            mediaPlayer.start();
+        } else if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            // Pausar la musica
+            mediaPlayer.pause();
+        }
+
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+        }
 
     }
 
