@@ -29,7 +29,7 @@ public class VistaJoc extends View {
     // Thread encarregat de processar el joc
     private final ThreadJoc thread = new ThreadJoc();
     private final int numObjectius;
-    private final Drawable[] ninjaDraws = new Drawable[]{getContext().getDrawable(R.drawable.ninja01), getContext().getDrawable(R.drawable.ninja02), getContext().getDrawable(R.drawable.ninja03)};
+    private final Drawable[] ninjaDraws = new Drawable[3];
     private final Vector<Grafics> objectius = new Vector<>();
     private final Drawable[] drawableObjectiu = new Drawable[8];
     private final Drawable drawableNinja;
@@ -66,6 +66,10 @@ public class VistaJoc extends View {
         // Obtenim referència al recurs ninja_enemic guardat en carpeta Res
         drawableEnemic = context.getResources().getDrawable(R.drawable.ninja_enemic, null);
         // Obtenim referència al recurs ninja guardat en carpeta Res
+
+        ninjaDraws[0] = context.getResources().getDrawable(R.drawable.ninja01);
+        ninjaDraws[1] = context.getResources().getDrawable(R.drawable.ninja02);
+        ninjaDraws[2] = context.getResources().getDrawable(R.drawable.ninja03);
         drawableNinja = ninjaDraws[Integer.parseInt(MainActivity.prefNinja)];
         drawableGanivet = context.getResources().getDrawable(R.drawable.ganivet, null);
         numObjectius = Integer.parseInt(MainActivity.prefEnemigos);
