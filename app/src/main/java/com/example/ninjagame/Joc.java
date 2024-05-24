@@ -17,6 +17,8 @@ public class Joc extends AppCompatActivity {
     boolean isMusicEnabled;
     private SharedPreferences generalPref;
 
+    private Bundle bundle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +58,15 @@ public class Joc extends AppCompatActivity {
 
     }
 
-    public void gameOver(String name, int score, int points, boolean winner) {
+    public void gameOver(int score,  boolean winner) {
+        int points;
+        String name;
+
+        bundle = this.getIntent().getExtras();
+        name = bundle.getString("userName");
+
+        points = preferences.getInt(name, 0);
+
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         SharedPreferences.Editor editor = preferences.edit();
         if(winner){

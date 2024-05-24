@@ -37,7 +37,6 @@ public class VistaJoc extends View {
     private final Drawable drawableEnemic;
     // //// LLANÇAMENT //////
     private final Grafics ganivet;
-    private final SharedPreferences preferences;
     private int girNinja; // Increment de direcció
     private float acceleracioNinja; // augment de velocitat
     // Quan es va realitzar l'últim procés
@@ -47,8 +46,6 @@ public class VistaJoc extends View {
     private boolean ganivetActiu = false;
     private int tempsGanivet;
     private int lifeNinja = 0;
-    private Bundle bundle;
-    private String name;
     private Joc pare;
     private int points;
     private final MediaPlayer mpLlancament;
@@ -60,7 +57,6 @@ public class VistaJoc extends View {
     public VistaJoc(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        preferences = context.getSharedPreferences(context.getString(R.string.NinjaGame), Context.MODE_PRIVATE);
         //Ninja Life
         lifeNinja = 1; // Asignar el número de vidas iniciales aquí
         // Obtenim referència al recurs ninja_enemic guardat en carpeta Res
@@ -129,8 +125,6 @@ public class VistaJoc extends View {
 
         ultimProces = System.currentTimeMillis();
         thread.start();
-        MusicManager.getInstance().initialize(getContext(), R.raw.base);
-
     }
 
     // Métode que dibuixa la vista
@@ -338,9 +332,7 @@ public class VistaJoc extends View {
                 winner = true;
             }
             VistaJoc.this.post(() -> {
-                bundle = pare.getIntent().getExtras();
-                name = bundle.getString("userName");
-                pare.gameOver(name, preferences.getInt(name, 0), points, winner);
+                pare.gameOver(points, winner);
             });
         }
     }
